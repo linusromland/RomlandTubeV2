@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - RomlandTube</title>
+    <script>
+        function registerUser(){
+            let username = document.getElementById("username").value
+            let password = document.getElementById("password").value
+            let confirmPassword = document.getElementById("passwordConfirm").value
+            let errorText = document.getElementById("errorText")
+
+            if(password == confirmPassword){
+                console.log("usercreation maybe")
+                let random = Math.floor(Math.random() * 20) + 1  
+                errorText.innerHTML = (random == 2) ? "Username taken!" : "";
+            } else {
+                errorText.innerHTML = "Password do not match!"
+            }
+            return false;
+        }
+    </script>
+</head>
+<body>
+    <form onsubmit="return registerUser();">
+
+        <input type="text" placeholder="username" name="username" id="username">
+        <br>
+        <input type="password" placeholder="password" name="password" id="password">
+        <br>
+        <input type="password" placeholder="Confirm Password" name="ConfirmPassword" id="passwordConfirm">
+        <p id="errorText" style="color: rgb(148, 75, 75); font-size: 50px;"><br></p>
+        <input type="submit" placeholder="Submit">
+    </form>
+</body>
+</html>
