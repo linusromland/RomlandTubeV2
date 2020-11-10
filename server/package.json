@@ -1,0 +1,33 @@
+{
+  "name": "romlandtube",
+  "version": "1.0.0",
+  "description": "RomlandTube - Streaming made cool",
+  "main": "main.js",
+  "scripts": {
+    "start": "forever main.js",
+    "devStart": "nodemon main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/linusromland/RomlandTubeV2.git"
+  },
+  "author": "Linus Romland, Markus Simonsen & Anton Helenius",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/linusromland/RomlandTubeV2/issues"
+  },
+  "homepage": "https://github.com/linusromland/RomlandTubeV2#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "ejs": "^3.1.5",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "mongoose": "^5.10.13",
+    "passport": "^0.4.1",
+    "passport-local": "^1.0.0",
+    "passport-local-mongoose": "^6.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  }
+}
