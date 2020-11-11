@@ -40,6 +40,10 @@ exports.findInDBOne = async (Model, toFind) => {
     return await Model.findOne({name: toFind})
 }
 
+exports.findInDB = async (Model) => {
+   return await Model.find({})
+}
+
 //takes input with type Model. Saves that model in Database. Cant be used before cnctDB or cnctDBAuth.
 exports.saveToDB = (input) => {
     input.save(() => {

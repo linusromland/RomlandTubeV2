@@ -1,3 +1,5 @@
+
+
 function clickedSubmit() {
     localStorage.setItem("theme", document.getElementById("themes").value);
 

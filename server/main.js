@@ -51,10 +51,19 @@ app.get("/", (req, res) => {
     name = req.cookies.usrName
     loggedin = true
   }
-  res.render("index", {
-    name: name,
-    loggedIn: loggedin,
-    eescape: eescape
+  fs.readdir(clientDir + "/themes", function (err, files) {
+    //handling error
+    if (err) {
+      return console.log('Unable to find or open the directory: ' + err);
+    }
+
+    res.render("index", {
+      name: name,
+      loggedIn: loggedin,
+      videos: getVids(),
+      eescape: eescape,
+      files: files
+    });
   });
 });
 
@@ -88,15 +97,11 @@ app.get("/upload", async (req, res) => {
   }
 })
 
-app.get("/themes", async (req, res) => {
-  
-})
-
 //if page does not exist, redirect to /
-app.get('*',function(req,res){  
+app.get('*', function (req, res) {
   res.redirect('/');
- });
- 
+});
+
 // POST ROUTES
 
 app.post("/register", async (req, res) => {
@@ -221,4 +226,9 @@ function giveCookies(req, res) {
     maxAge: 2147483647,
     //domain: 'romland.space'
   });
+}
+
+function getVids(){
+  return "cool"
+  
 }
