@@ -51,7 +51,7 @@ app.post("/register", async (req, res) => {
       const userExist = await dBModule.findInDBOne(User, req.body.name);
       if (userExist == null) {
         dBModule.saveToDB(createUser(req.body.name, req.body.password));
-        res.redirect("/");
+        res.status(200).send();
       } else {
         return res.status(400).send("taken");
       }
@@ -63,3 +63,13 @@ app.post("/register", async (req, res) => {
 
 //Starts the HTTP Server on port 3000
 app.listen(port, () => console.log(`Server listening on port ${port}!`));
+
+
+// FUNCTIONS
+function createUser(nameIN, passIN) {
+  let tmp = new User({
+    name: nameIN,
+    password: passIN,
+  });
+  return tmp;
+}
