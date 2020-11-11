@@ -1,6 +1,6 @@
-const { session } = require("passport");
-
-const express = require("express"),
+//Ipmports depedencies and others files
+const { session } = require("passport"),
+    express = require("express"),
     bodyParser = require("body-parser"),
     passportLocalMongoose = require("passport-local-mongoose"),
     passport = require("passport"),
@@ -14,13 +14,22 @@ const express = require("express"),
 
 const clientDir = __dirname + "/client/";
 
+//creates the User
+const User = mongoose.model("User", UserSchema);
+
+/*Enables JSON, extended for express and 
+creates a static path for CSS etc */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(clientDir));
 
+//Enables EJS
 app.set("view engine", "ejs");
 
-dBModule.cnctDB("RomlandTubev2")
+//Connect to Mongo
+dBModule.cnctDB("RomlandTube")
+
+// GET ROUTES
 
 app.get("/", (req, res) => {
     res.render("index");
@@ -34,27 +43,14 @@ app.get("/register", (req, res) => {
     res.render("register");
 });
 
+// POST ROUTES
+
 app.post("/register", async (req, res) => {
     console.log("New User Registration POST!");
     try {
       const userExist = await dBModule.findInDBOne(User, req.body.name);
       if (userExist == null) {
-        const hashedPassword = req.body.password;
-        dBModule.saveToDB(createUser(req.body.name, hashedPassword));
-        res.cookie("usrName", req.body.name, {
-          httpOnly: true,
-          secure: true,
-          sameSite: true,
-          maxAge: 2147483647,
-          domain: 'romland.space'
-        });
-        res.cookie("pswd", req.body.password, {
-          httpOnly: true,
-          secure: true,
-          sameSite: true,
-          maxAge: 2147483647,
-          domain: 'romland.space'
-        });
+        dBModule.saveToDB(createUser(req.body.name, req.body.password));
         res.redirect("/");
       } else {
         return res.status(400).send("taken");
@@ -65,4 +61,5 @@ app.post("/register", async (req, res) => {
   });
 
 
+//Starts the HTTP Server on port 3000
 app.listen(port, () => console.log(`Server listening on port ${port}!`));

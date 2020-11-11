@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 let db;
 
+//Connect to MongoDB With Authentication. 
 exports.cnctDBAuth = (collectionname) => {
     const mongAuth = require('./mongoauth.json')
     mongoose.connect(
@@ -17,10 +18,11 @@ exports.cnctDBAuth = (collectionname) => {
     db = mongoose.connection;
     db.on('error', console.error.bind(console, 'connection error:'));
     db.once('open', function () {
-        console.log("logged in to " + collectionname)
+        console.log("loConnected to MongoDB using collection " + collectionname)
     });
 }
 
+//Connect to MongoDB
 exports.cnctDB = (collectionname) => {
     let dbLink = `mongodb://localhost/${collectionname}`
     mongoose.connect(dbLink, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -28,15 +30,17 @@ exports.cnctDB = (collectionname) => {
     db = mongoose.connection;
     db.on('error', console.error.bind(console, 'connection error:'));
     db.once('open', function () {
-        console.log("logged in to " + collectionname)
+        console.log("Connected to MongoDB using collection " + collectionname)
     });
 
 }
 
+//Finds "toFind" in Database on the Model provided
 exports.findInDBOne = async (Model, toFind) => {
     return await Model.findOne({name: toFind})
 }
 
+//takes input with type Model. Saves that model in Database. Cant be used before cnctDB or cnctDBAuth.
 exports.saveToDB = (input) => {
     input.save(() => {
         console.log(`Successfully saved ${input} to the database!`)

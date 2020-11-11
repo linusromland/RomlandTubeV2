@@ -4,6 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Register - RomlandTube</title>
+
+    <!--IMPORT OF CSS-->
+    <link rel="stylesheet" href="/CSS/main.css">
+    <link rel="stylesheet" href="/CSS/register.css">
+
+    <!--IMPORT OF Crypto-JS used for the hashing and salting of password-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/md5.js"></script>
+
     <script>
       function registerUser() {
         let password = document.getElementById("password").value;
@@ -12,21 +21,20 @@
 
         if (password == confirmPassword) {
           console.log("usercreation maybe");
-          let random = Math.floor(Math.random() * 20) + 1;
-
           let request = new XMLHttpRequest();
           let name = document.getElementById("username").value;
-          let pass = CryptoJS.MD5(pass + name);
+          let pass = CryptoJS.MD5(password + name);
           request.open("POST", "/register", false);
           request.setRequestHeader(
             "Content-type",
             "application/x-www-form-urlencoded"
           );
           request.send(`name=${name}&password=${pass}`);
-          if(request.responseText == "taken"){
+          if(request.response == "taken"){
               errorText.innerHTML = "Username taken!"
-          }else{
-              window.location("/")
+          }else if(request.status == 500){
+             //window.location("/")
+             errorText.innerHTML = "Error occured!"
           }
         } else {
           errorText.innerHTML = "Password do not match!";
@@ -51,7 +59,7 @@
         name="ConfirmPassword"
         id="passwordConfirm"
       />
-      <p id="errorText" style="color: rgb(255, 0, 0); font-size: 50px">
+      <p id="errorText">
         <br />
       </p>
       <input type="submit" placeholder="Submit" />

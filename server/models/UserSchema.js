@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+
+//Creates the UserSchema and exports it
 const UserSchema  = new mongoose.Schema({
   name :{
       type  : String,
