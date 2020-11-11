@@ -1,15 +1,13 @@
 <header>
-    <a href="/"><h1 id="title">RomlandTube</h1></a>
+    <a href="/" id="title">RomlandTube</a>
     <%if (loggedIn) { %>
-    <p>Logged in as: <%- eescape(name) %></p>
-    <a class="headlink" href="/upload">Upload</a>
+    <a id="logInName">Logged in as: <%- eescape(name) %></a>
     <a class="headlink" href="/logout">Log Out</a>
+    <a class="headlink" href="/upload">Upload</a>
     <% } else{ %>
-    <a class="headlink" href="/login">Login</a>
     <a class="headlink" href="/register">Register</a>
+    <a class="headlink" href="/login">Login</a>
     <% } %>
-
-    <br>
 
     <label for="theme">Theme:</label>
     <select onchange="clickedSubmit()" name="theme" id="themes">

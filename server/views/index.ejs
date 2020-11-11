@@ -16,7 +16,11 @@
   </head>
   <body onload="onLoad()">
     <%- include ("partials/header.ejs") %>
-    <br /><br />
-    
+    <% for(var i=0; i < videos.length; i++) { %>
+      <div>
+          <a href="<%=videos[i].link%>"><%=videos[i].name%></a>
+          <p><%=videos[i].desc%></p>
+      </div>
+   <% } %>
   </body>
 </html>

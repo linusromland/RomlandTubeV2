@@ -1,4 +1,10 @@
 mongoauth.json
+server/client/upload/thumbnails/*
+server/client/upload/videos/*
+!server/client/upload/thumbnails/.gitkeep
+!server/client/upload/videos/.gitkeep
+
+
 # Logs
 logs
 *.log

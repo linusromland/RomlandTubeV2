@@ -51,7 +51,7 @@ app.get("/", (req, res) => {
     name = req.cookies.usrName
     loggedin = true
   }
-  fs.readdir(clientDir + "/themes", function (err, files) {
+  fs.readdir(clientDir + "/themes", async function (err, files) {
     //handling error
     if (err) {
       return console.log('Unable to find or open the directory: ' + err);
@@ -60,7 +60,7 @@ app.get("/", (req, res) => {
     res.render("index", {
       name: name,
       loggedIn: loggedin,
-      videos: getVids(),
+      videos: await getVids(),
       eescape: eescape,
       files: files
     });
@@ -221,11 +221,12 @@ function createUser(nameIN, passIN) {
   return tmp;
 }
 
-function createVideo(name, desc, link, channel) {
+function createVideo(name, desc, link, thumbLink, channel) {
   let tmp = new Video({
     name: name,
     desc: desc,
     link: link,
+    thumbLink: thumbLink,
     channel: channel,
   });
   return tmp;
@@ -260,7 +261,6 @@ function giveCookies(req, res) {
   });
 }
 
-function getVids(){
-  return "cool"
-  
+async function getVids(){
+  return await dBModule.findInDB(Video)  
 }
