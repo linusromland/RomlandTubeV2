@@ -24,19 +24,21 @@
           let request = new XMLHttpRequest();
           let name = document.getElementById("username").value;
           let pass = CryptoJS.MD5(password + name);
-          request.open("POST", "/register", false);
+          request.open("POST", "/register", true);
           request.setRequestHeader(
             "Content-type",
             "application/x-www-form-urlencoded"
           );
           request.send(`name=${name}&password=${pass}`);
-          if (request.response == "taken") {
-            errorText.innerHTML = "Username taken!";
-          } else if (request.status == 500) {
-            errorText.innerHTML = "Error occured!";
-          }else if(request.status == 200){
-            window.location = "/"
-          }
+          request.onreadystatechange = function () {
+            if (request.response == "taken") {
+              errorText.innerHTML = "Username taken!";
+            } else if (request.status == 500) {
+              errorText.innerHTML = "Error occured!";
+            } else if (request.status == 201) {
+              window.location = "/";
+            }
+          };
         } else {
           errorText.innerHTML = "Passwords do not match!";
         }
@@ -65,7 +67,7 @@
       <p id="errorText">
         <br />
       </p>
-      <input type="submit" placeholder="Submit" />
+      <input type="submit" value="Register" />
     </form>
   </body>
 </html>

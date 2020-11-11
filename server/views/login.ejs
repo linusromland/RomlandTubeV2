@@ -1,15 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login - RomlandTube</title>
-</head>
-<body>
-    <form>
-        <input type="text" placeholder="username" name="username">
-        <input type="password" placeholder="password" name="password">
-        <input type="button">
+    <!--IMPORT OF CSS-->
+    <link rel="stylesheet" href="/CSS/main.css" />
+    <link rel="stylesheet" href="/CSS/register.css" />
+
+    <!--IMPORT OF Crypto-JS used for the hashing and salting of password-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/md5.js"></script>
+
+    <script>
+      function loginUser() {
+        let errorArea = document.getElementById("errorText");
+        let request = new XMLHttpRequest();
+        let name = document.getElementById("username").value;
+        let pass = CryptoJS.MD5(
+          document.getElementById("password").value + name
+        );
+        request.open("POST", "/login", true);
+        request.setRequestHeader(
+          "Content-type",
+          "application/x-www-form-urlencoded"
+        );
+        request.send(`name=${name}&password=${pass}`);
+        request.onreadystatechange = function () {
+          if (request.status == 200) window.location = "/"
+          if (request.status == 401) {
+            errorArea.innerHTML = "Wrong Username or Password!";
+          }
+        };
+      }
+    </script>
+  </head>
+  <body>
+    <form onsubmit="loginUser();return false;">
+      <input type="text" placeholder="username" id="username" name="username" />
+      <input
+        type="password"
+        placeholder="password"
+        id="password"
+        name="password"
+      />
+      <p id="errorText"><br /></p>
+      <input type="submit" value="Log In" />
     </form>
-</body>
+  </body>
 </html>

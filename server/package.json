@@ -19,7 +19,9 @@
   "homepage": "https://github.com/linusromland/RomlandTubeV2#readme",
   "dependencies": {
     "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.5",
     "ejs": "^3.1.5",
+    "escape-html": "^1.0.3",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "mongoose": "^5.10.13",
