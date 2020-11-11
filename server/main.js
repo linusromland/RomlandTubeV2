@@ -34,4 +34,35 @@ app.get("/register", (req, res) => {
     res.render("register");
 });
 
+app.post("/register", async (req, res) => {
+    console.log("New User Registration POST!");
+    try {
+      const userExist = await dBModule.findInDBOne(User, req.body.name);
+      if (userExist == null) {
+        const hashedPassword = req.body.password;
+        dBModule.saveToDB(createUser(req.body.name, hashedPassword));
+        res.cookie("usrName", req.body.name, {
+          httpOnly: true,
+          secure: true,
+          sameSite: true,
+          maxAge: 2147483647,
+          domain: 'romland.space'
+        });
+        res.cookie("pswd", req.body.password, {
+          httpOnly: true,
+          secure: true,
+          sameSite: true,
+          maxAge: 2147483647,
+          domain: 'romland.space'
+        });
+        res.redirect("/");
+      } else {
+        return res.status(400).send("taken");
+      }
+    } catch {
+      res.status(500).send();
+    }
+  });
+
+
 app.listen(port, () => console.log(`Server listening on port ${port}!`));

@@ -19,7 +19,6 @@ exports.cnctDBAuth = (collectionname) => {
     db.once('open', function () {
         console.log("logged in to " + collectionname)
     });
-
 }
 
 exports.cnctDB = (collectionname) => {
@@ -32,6 +31,10 @@ exports.cnctDB = (collectionname) => {
         console.log("logged in to " + collectionname)
     });
 
+}
+
+exports.findInDBOne = async (Model, toFind) => {
+    return await Model.findOne({name: toFind})
 }
 
 exports.saveToDB = (input) => {

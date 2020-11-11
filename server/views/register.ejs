@@ -1,37 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Register - RomlandTube</title>
     <script>
-        function registerUser(){
-            let username = document.getElementById("username").value
-            let password = document.getElementById("password").value
-            let confirmPassword = document.getElementById("passwordConfirm").value
-            let errorText = document.getElementById("errorText")
+      function registerUser() {
+        let password = document.getElementById("password").value;
+        let confirmPassword = document.getElementById("passwordConfirm").value;
+        let errorText = document.getElementById("errorText");
 
-            if(password == confirmPassword){
-                console.log("usercreation maybe")
-                let random = Math.floor(Math.random() * 20) + 1  
-                errorText.innerHTML = (random == 2) ? "Username taken!" : "";
-            } else {
-                errorText.innerHTML = "Password do not match!"
-            }
-            return false;
+        if (password == confirmPassword) {
+          console.log("usercreation maybe");
+          let random = Math.floor(Math.random() * 20) + 1;
+
+          let request = new XMLHttpRequest();
+          let name = document.getElementById("username").value;
+          let pass = CryptoJS.MD5(pass + name);
+          request.open("POST", "/register", false);
+          request.setRequestHeader(
+            "Content-type",
+            "application/x-www-form-urlencoded"
+          );
+          request.send(`name=${name}&password=${pass}`);
+          if(request.responseText == "taken"){
+              errorText.innerHTML = "Username taken!"
+          }else{
+              window.location("/")
+          }
+        } else {
+          errorText.innerHTML = "Password do not match!";
         }
+      }
     </script>
-</head>
-<body>
-    <form onsubmit="return registerUser();">
-
-        <input type="text" placeholder="username" name="username" id="username">
-        <br>
-        <input type="password" placeholder="password" name="password" id="password">
-        <br>
-        <input type="password" placeholder="Confirm Password" name="ConfirmPassword" id="passwordConfirm">
-        <p id="errorText" style="color: rgb(148, 75, 75); font-size: 50px;"><br></p>
-        <input type="submit" placeholder="Submit">
+  </head>
+  <body>
+    <form onsubmit="registerUser();return false;">
+      <input type="text" placeholder="username" name="username" id="username" />
+      <br />
+      <input
+        type="password"
+        placeholder="password"
+        name="password"
+        id="password"
+      />
+      <br />
+      <input
+        type="password"
+        placeholder="Confirm Password"
+        name="ConfirmPassword"
+        id="passwordConfirm"
+      />
+      <p id="errorText" style="color: rgb(255, 0, 0); font-size: 50px">
+        <br />
+      </p>
+      <input type="submit" placeholder="Submit" />
     </form>
-</body>
+  </body>
 </html>
