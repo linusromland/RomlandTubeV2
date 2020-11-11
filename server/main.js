@@ -9,28 +9,37 @@ const { session } = require("passport"),
   app = express(),
   port = 3000,
   UserSchema = require("./models/UserSchema.js"),
+  VideoSchema = require("./models/VideoSchema.js"),
   dBModule = require('./dbModule'),
   cookieParser = require("cookie-parser"),
-  eescape = require("escape-html")
+  eescape = require("escape-html"),
+  upload = require('express-fileupload'),
+  mime = require('mime-types'),
+  fs = require('fs')
 
 
 const clientDir = __dirname + "/client/";
 
-//creates the User
+//Creates the User and Video Object
 const User = mongoose.model("User", UserSchema);
+const Video = mongoose.model("Video", VideoSchema);
 
 /*Enables JSON, Cookies, extended for express and 
 creates a static path for CSS etc */
 app.use(express.json());
 app.use(cookieParser());
+app.use(upload())
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(clientDir));
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 
 //Enables EJS
 app.set("view engine", "ejs");
 
 //Connect to Mongo
-dBModule.cnctDBAuth("RomlandTube")
+dBModule.cnctDB("RomlandTube")
 
 // GET ROUTES
 
@@ -61,6 +70,14 @@ app.get("/logout", (req, res) => {
   res.clearCookie("pswd");
   res.redirect("/");
 });
+
+app.get("/upload", async (req, res) => {
+  if (await logIn(req.cookies.usrName, req.cookies.pswd)) {
+    res.render("upload")
+  } else {
+    res.redirect("/")
+  }
+})
 
 // POST ROUTES
 
@@ -102,6 +119,41 @@ app.post("/authUser", async (req, res) => {
   }
 });
 
+app.post('/upload', async (_req, _res) => {
+  if (await logIn(req.cookie.usrName, req.cookie.pswd)) {
+    if (_req.files) {
+      let file = _req.files
+      let filename = file.theFile.name
+      let filedata = file.theFile.data
+
+      let fileExtention = mime.extension(file.theFile.mimetype)
+
+      if (file.theFile.size < 100 * (1000000) && !(fileExtention == false)) {
+        let fileName = file.theFile.md5 + "." + fileExtention
+        let filepath = clientDir + "/upload/" + fileName
+        fs.writeFile(filepath, filedata, function (err) {
+          if (err) {
+            return console.log(err)
+          }
+          dBModule.saveToDB(createVideo("name", "desc", "link", "channl"))
+          _res.header('Content-Type', 'application/json');
+          /*_res.header("Access-Control-Allow-Headers", "*")
+          _res.header("Access-Control-Allow-Origin", "*")*/
+
+          _res.send(`{ \"upload\": \"successful\", \"link\": \"/image/${fileName}\"}`)
+        })
+      } else {
+        _res.send("{ \"upload\": \"failed\" }")
+      }
+
+    } else {
+      _res.status(500)
+    }
+  } else {
+    _res.status(500)
+  }
+})
+
 
 //Starts the HTTP Server on port 3000
 app.listen(port, () => console.log(`Server listening on port ${port}!`));
@@ -111,6 +163,16 @@ function createUser(nameIN, passIN) {
   let tmp = new User({
     name: nameIN,
     password: passIN,
+  });
+  return tmp;
+}
+
+function createVideo(name, desc, link, channel) {
+  let tmp = new Video({
+    name: name,
+    desc: desc,
+    link: link,
+    channel: channel,
   });
   return tmp;
 }
