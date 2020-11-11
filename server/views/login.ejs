@@ -12,30 +12,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/md5.js"></script>
 
-    <script>
-      function loginUser() {
-        let errorArea = document.getElementById("errorText");
-        let request = new XMLHttpRequest();
-        let name = document.getElementById("username").value;
-        let pass = CryptoJS.MD5(
-          document.getElementById("password").value + name
-        );
-        request.open("POST", "/login", true);
-        request.setRequestHeader(
-          "Content-type",
-          "application/x-www-form-urlencoded"
-        );
-        request.send(`name=${name}&password=${pass}`);
-        request.onreadystatechange = function () {
-          if (request.status == 200) window.location = "/"
-          if (request.status == 401) {
-            errorArea.innerHTML = "Wrong Username or Password!";
-          }
-        };
-      }
-    </script>
+    <!--Import of Local JavaScript-->
+    <script src="/js/global.js"></script>
+    <script src="/js/login.js"></script>
   </head>
-  <body>
+  <body onload="onLoad()">
     <form onsubmit="loginUser();return false;">
       <input type="text" placeholder="username" id="username" name="username" />
       <input

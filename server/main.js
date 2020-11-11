@@ -28,12 +28,13 @@ const Video = mongoose.model("Video", VideoSchema);
 creates a static path for CSS etc */
 app.use(express.json());
 app.use(cookieParser());
-app.use(upload())
+app.use(upload());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(clientDir));
 app.use(bodyParser.urlencoded({
   extended: true
 }));
+
 
 //Enables EJS
 app.set("view engine", "ejs");
@@ -57,12 +58,20 @@ app.get("/", (req, res) => {
   });
 });
 
-app.get("/login", (req, res) => {
-  res.render("login");
+app.get("/login", async (req, res) => {
+  if (await logIn(req.cookies.usrName, req.cookies.pswd)) {
+    res.redirect("/")
+  } else {
+    res.render("login");
+  }
 });
 
-app.get("/register", (req, res) => {
-  res.render("register");
+app.get("/register", async (req, res) => {
+  if (await logIn(req.cookies.usrName, req.cookies.pswd)) {
+    res.redirect("/")
+  } else {
+    res.render("register");
+  }
 });
 
 app.get("/logout", (req, res) => {
@@ -79,6 +88,15 @@ app.get("/upload", async (req, res) => {
   }
 })
 
+app.get("/themes", async (req, res) => {
+  
+})
+
+//if page does not exist, redirect to /
+app.get('*',function(req,res){  
+  res.redirect('/');
+ });
+ 
 // POST ROUTES
 
 app.post("/register", async (req, res) => {
@@ -120,27 +138,26 @@ app.post("/authUser", async (req, res) => {
 });
 
 app.post('/upload', async (_req, _res) => {
-  if (await logIn(req.cookie.usrName, req.cookie.pswd)) {
+  if (await logIn(_req.cookies.usrName, _req.cookies.pswd)) {
     if (_req.files) {
       let file = _req.files
       let filename = file.theFile.name
       let filedata = file.theFile.data
-
       let fileExtention = mime.extension(file.theFile.mimetype)
 
-      if (file.theFile.size < 100 * (1000000) && !(fileExtention == false)) {
+      if (file.theFile.size < 100 * (1000000) && !(fileExtention == false) && file.theFile.mimetype.includes("video/")) {
         let fileName = file.theFile.md5 + "." + fileExtention
         let filepath = clientDir + "/upload/" + fileName
         fs.writeFile(filepath, filedata, function (err) {
           if (err) {
             return console.log(err)
           }
-          dBModule.saveToDB(createVideo("name", "desc", "link", "channl"))
+          dBModule.saveToDB(createVideo(_req.body.name, _req.body.desc, `/upload/${fileName}`, _req.cookies.usrName))
           _res.header('Content-Type', 'application/json');
           /*_res.header("Access-Control-Allow-Headers", "*")
           _res.header("Access-Control-Allow-Origin", "*")*/
 
-          _res.send(`{ \"upload\": \"successful\", \"link\": \"/image/${fileName}\"}`)
+          _res.send(`{ \"upload\": \"successful\", \"link\": \"/upload/${fileName}\"}`)
         })
       } else {
         _res.send("{ \"upload\": \"failed\" }")

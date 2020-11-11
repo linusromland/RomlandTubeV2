@@ -3,61 +3,34 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RomlandTube - Streaming Made Cool</title>
+    <title>RomlandTube</title>
+
+    <!--Import of CSS-->
     <link rel="stylesheet" href="/CSS/main.css" />
-    <script>
-      loadCSS()
-      function onLoad() {
-        document.getElementById("cars").value = (localStorage.getItem('car'));
+    <link rel="stylesheet" id="customCSS" />
 
-        console.log("Hmm")
-        
-        //loadCSS()
-      }
-
-      function clickedSubmit(){
-
-        localStorage.setItem("car", document.getElementById("cars").value)
-
-        alert(document.getElementById("cars").value)
-        loadCSS(document.getElementById("cars").value)
-        
-        return false
-      }
-
-      function loadCSS(theme){
-        // Get HTML head element 
-        var head = document.getElementsByTagName('HEAD')[0];  
-  
-        // Create new link Element 
-        var link = document.createElement('link'); 
-  
-        // set the attributes for link element  
-        link.rel = 'stylesheet';  
-      
-        link.type = 'text/css'; 
-      
-        link.href = `/themes/${theme}.css`;  
-  
-        // Append link element to HTML head 
-        head.appendChild(link);  
-      }
-      
-    </script>
+    <!--Import of Local JavaScript-->
+    <script src="/js/global.js"></script>
+    <script src="/js/index.js"></script>
   </head>
   <body onload="onLoad()">
+    <header>
     <h1>RomlandTube - Streaming, Made Cool!</h1>
-    <p><%- eescape(name) %></p>
+    <%if (loggedIn) { %>
+    <p>Logged in as: <%- eescape(name) %></p>
+    <a href="/upload">Upload</a>
+    <a href="/logout">Log Out</a>
+    <% } else{ %>
     <a href="/login">Login</a>
     <a href="/register">Register</a>
-    <a href="/logout">Log Out</a>
-
-      <label for="cars">Choose a car:</label>
-      <select onchange="clickedSubmit()" name="cars" id="cars">
-        <option value="dark">Dark</option>
-        <option value="saab">Light</option>
-        <option value="opel">Blue</option>
-        <option value="nisse">Cool</option>
-      </select>
+    <% } %></header>
+    <br /><br />
+    <label for="theme">Theme:</label>
+    <select onchange="clickedSubmit()" name="theme" id="themes">
+      <option value="dark">Dark</option>
+      <option value="light">Light</option>
+      <option value="opel">Blue</option>
+      <option value="nisse">Nisse</option>
+    </select>
   </body>
 </html>

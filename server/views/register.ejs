@@ -13,40 +13,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/md5.js"></script>
 
-    <script>
-      function registerUser() {
-        let password = document.getElementById("password").value;
-        let confirmPassword = document.getElementById("passwordConfirm").value;
-        let errorText = document.getElementById("errorText");
-
-        if (password == confirmPassword) {
-          console.log("usercreation maybe");
-          let request = new XMLHttpRequest();
-          let name = document.getElementById("username").value;
-          let pass = CryptoJS.MD5(password + name);
-          request.open("POST", "/register", true);
-          request.setRequestHeader(
-            "Content-type",
-            "application/x-www-form-urlencoded"
-          );
-          request.send(`name=${name}&password=${pass}`);
-          request.onreadystatechange = function () {
-            if (request.response == "taken") {
-              errorText.innerHTML = "Username taken!";
-            } else if (request.status == 500) {
-              errorText.innerHTML = "Error occured!";
-            } else if (request.status == 201) {
-              window.location = "/";
-            }
-          };
-        } else {
-          errorText.innerHTML = "Passwords do not match!";
-        }
-      }
-    </script>
+    <!--Import of Local JavaScript-->
+    <script src="/js/global.js"></script>
+    <script src="/js/register.js"></script>
   </head>
 
-  <body>
+  <body onload="onLoad()">
     <h1>RomlandTube - Register</h1>
     <form onsubmit="registerUser();return false;">
       <input type="text" placeholder="username" name="username" id="username" />
