@@ -71,18 +71,19 @@ app.get("/login", async (req, res) => {
   if (await logIn(req.cookies.usrName, req.cookies.pswd)) {
     res.redirect("/")
   } else {
-    
+
     fs.readdir(clientDir + "/themes", function (err, files) {
       //handling error
       if (err) {
         return console.log('Unable to find or open the directory: ' + err);
       }
-  
+
       res.render("login", {
         loggedIn: false,
         files: files
       });
-    });  }
+    });
+  }
 });
 
 app.get("/register", async (req, res) => {
@@ -94,7 +95,7 @@ app.get("/register", async (req, res) => {
       if (err) {
         return console.log('Unable to find or open the directory: ' + err);
       }
-  
+
       res.render("register", {
         loggedIn: false,
         files: files
@@ -116,7 +117,7 @@ app.get("/upload", async (req, res) => {
       if (err) {
         return console.log('Unable to find or open the directory: ' + err);
       }
-  
+
       res.render("upload", {
         name: req.cookies.usrName,
         loggedIn: true,
@@ -178,33 +179,42 @@ app.post('/upload', async (_req, _res) => {
   if (await logIn(_req.cookies.usrName, _req.cookies.pswd)) {
     if (_req.files) {
       let file = _req.files
-      let filename = file.theFile.name
-      let filedata = file.theFile.data
-      let fileExtention = mime.extension(file.theFile.mimetype)
+      let videoName = file.video.name
+      let videoData = file.video.data
+      let thumbName = file.thumb.name
+      let thumbData = file.thumb.data
 
-      if (file.theFile.size < 100 * (1000000) && !(fileExtention == false) && file.theFile.mimetype.includes("video/")) {
-        let fileName = file.theFile.md5 + "." + fileExtention
-        let filepath = clientDir + "/upload/" + fileName
-        fs.writeFile(filepath, filedata, function (err) {
+
+      if (checkFile(file.video, "video/", 100) && checkFile(file.thumb, "image/", 100)) {
+        let videoExtention = mime.extension(file.video.mimetype)
+        let thumbExtention = mime.extension(file.thumb.mimetype)
+
+        let videoName = file.video.md5 + "." + videoExtention
+        let videoPath = clientDir + "upload/videos/" + videoName
+        let thumbName = file.video.md5 + "." + thumbExtention
+        let thumbPath = clientDir + "upload/thumbnails/" + thumbName
+        fs.writeFile(videoPath, videoData, function (err) {
           if (err) {
             return console.log(err)
           }
-          dBModule.saveToDB(createVideo(_req.body.name, _req.body.desc, `/upload/${fileName}`, _req.cookies.usrName))
-          _res.header('Content-Type', 'application/json');
-          /*_res.header("Access-Control-Allow-Headers", "*")
-          _res.header("Access-Control-Allow-Origin", "*")*/
-
-          _res.send(`{ \"upload\": \"successful\", \"link\": \"/upload/${fileName}\"}`)
         })
+        fs.writeFile(thumbPath, thumbData, function (err) {
+          if (err) {
+            return console.log(err)
+          }
+        })
+        dBModule.saveToDB(createVideo(_req.body.name, _req.body.desc, videoPath, thumbPath, _req.cookies.usrName))
+        _res.header('Content-Type', 'application/json');
+        _res.status(200).send()
       } else {
-        _res.send("{ \"upload\": \"failed\" }")
+        _res.status(401).send()
       }
-
     } else {
-      _res.status(500)
+      _res.status(500).send()
     }
+
   } else {
-    _res.status(500)
+    _res.status(500).send()
   }
 })
 
@@ -261,6 +271,11 @@ function giveCookies(req, res) {
   });
 }
 
-async function getVids(){
-  return await dBModule.findInDB(Video)  
+async function getVids() {
+  return await dBModule.findInDB(Video)
+}
+
+function checkFile(file, wantedType, wantedSize) {
+  let fileExtention = mime.extension(file.mimetype)
+  return (file.size < wantedSize * (1000000) && fileExtention && file.mimetype.includes(wantedType))
 }

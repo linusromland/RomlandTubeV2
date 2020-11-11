@@ -6,6 +6,8 @@ THIS IS ANTENNS*/
 
 body {
   background-color: purple;
+  margin: 0;
+  padding: 0;
 }
 
 * {
@@ -23,6 +25,8 @@ header {
   background-color: black;
   width: 100vw;
   height: 100px;
+  margin: 0;
+  padding: 0;
 }
 
 #title {
