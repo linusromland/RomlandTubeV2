@@ -1,0 +1,24 @@
+<header>
+    <a href="/"><h1 id="title">RomlandTube</h1></a>
+    <%if (loggedIn) { %>
+    <p>Logged in as: <%- eescape(name) %></p>
+    <a class="headlink" href="/upload">Upload</a>
+    <a class="headlink" href="/logout">Log Out</a>
+    <% } else{ %>
+    <a class="headlink" href="/login">Login</a>
+    <a class="headlink" href="/register">Register</a>
+    <% } %>
+
+    <br>
+
+    <label for="theme">Theme:</label>
+    <select onchange="clickedSubmit()" name="theme" id="themes">
+
+      <% for(let i=0; i<files.length; i++) {%>
+        <% let name = files[i].substring(0,files[i].length-4) %> 
+        <% let capitalName = name.charAt(0).toUpperCase() + name.slice(1); %>
+        <% let selected = (name == "light") ? "selected" : "" %> 
+        <option value="<%- name %>" <%- selected %> ><%- capitalName %></option>
+     <% } %>
+    </select>
+  </header>

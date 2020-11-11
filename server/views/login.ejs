@@ -17,6 +17,7 @@
     <script src="/js/login.js"></script>
   </head>
   <body onload="onLoad()">
+    <%- include ("partials/header.ejs") %>
     <form onsubmit="loginUser();return false;">
       <input type="text" placeholder="username" id="username" name="username" />
       <input

@@ -12,28 +12,11 @@
     <!--Import of Local JavaScript-->
     <script src="/js/global.js"></script>
     <script src="/js/index.js"></script>
+    
   </head>
   <body onload="onLoad()">
-    <header>
-      <h1>RomlandTube - Streaming, Made Cool!</h1>
-      <%if (loggedIn) { %>
-      <p>Logged in as: <%- eescape(name) %></p>
-      <a href="/upload">Upload</a>
-      <a href="/logout">Log Out</a>
-      <% } else{ %>
-      <a href="/login">Login</a>
-      <a href="/register">Register</a>
-      <% } %>
-    </header>
+    <%- include ("partials/header.ejs") %>
     <br /><br />
-    <label for="theme">Theme:</label>
-    <select onchange="clickedSubmit()" name="theme" id="themes">
-
-      <% for(let i=0; i<files.length; i++) {%>
-        <% let name = files[i].substring(0,files[i].length-4) %> 
-        <% let capitalName = name.charAt(0).toUpperCase() + name.slice(1); %> 
-        <option value="<%- name %>"><%- capitalName %></option>
-     <% } %>
-    </select>
+    
   </body>
 </html>

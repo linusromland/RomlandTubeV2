@@ -1,12 +1,18 @@
 function onLoad() {
-    
+
     var theme = localStorage.getItem("theme");
 
-    if(document.getElementById("themes") && document.getElementById("themes").value){
-        document.getElementById("themes").value = theme
-    }
+    if (theme) {
+        if(document.getElementById("themes") && document.getElementById("themes").value){
+            document.getElementById("themes").value = theme
 
-    loadCSS(localStorage.getItem("theme"));
+        }
+        
+        loadCSS(theme);
+    }
+    if(!theme && document.getElementById("themes") && document.getElementById("themes").value){
+        loadCSS(document.getElementById("themes").value)
+    }
 }
 
 function loadCSS(theme) {
@@ -32,3 +38,12 @@ function loadCSS(theme) {
 
     link.href = `/themes/${theme}.css`;
 }
+
+function clickedSubmit() {
+    localStorage.setItem("theme", document.getElementById("themes").value);
+    
+    loadCSS(document.getElementById("themes").value);
+    
+    return false;
+}
+

@@ -71,15 +71,35 @@ app.get("/login", async (req, res) => {
   if (await logIn(req.cookies.usrName, req.cookies.pswd)) {
     res.redirect("/")
   } else {
-    res.render("login");
-  }
+    
+    fs.readdir(clientDir + "/themes", function (err, files) {
+      //handling error
+      if (err) {
+        return console.log('Unable to find or open the directory: ' + err);
+      }
+  
+      res.render("login", {
+        loggedIn: false,
+        files: files
+      });
+    });  }
 });
 
 app.get("/register", async (req, res) => {
   if (await logIn(req.cookies.usrName, req.cookies.pswd)) {
     res.redirect("/")
   } else {
-    res.render("register");
+    fs.readdir(clientDir + "/themes", function (err, files) {
+      //handling error
+      if (err) {
+        return console.log('Unable to find or open the directory: ' + err);
+      }
+  
+      res.render("register", {
+        loggedIn: false,
+        files: files
+      });
+    });
   }
 });
 
@@ -91,7 +111,19 @@ app.get("/logout", (req, res) => {
 
 app.get("/upload", async (req, res) => {
   if (await logIn(req.cookies.usrName, req.cookies.pswd)) {
-    res.render("upload")
+    fs.readdir(clientDir + "/themes", function (err, files) {
+      //handling error
+      if (err) {
+        return console.log('Unable to find or open the directory: ' + err);
+      }
+  
+      res.render("upload", {
+        name: req.cookies.usrName,
+        loggedIn: true,
+        eescape: eescape,
+        files: files
+      });
+    });
   } else {
     res.redirect("/")
   }
