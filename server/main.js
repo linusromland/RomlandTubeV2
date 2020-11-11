@@ -232,6 +232,9 @@ function createUser(nameIN, passIN) {
 }
 
 function createVideo(name, desc, link, thumbLink, channel) {
+  name = name.substring(0, 25)
+  desc = desc.substring(0, 150)
+
   let tmp = new Video({
     name: name,
     desc: desc,

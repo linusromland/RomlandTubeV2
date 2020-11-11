@@ -18,8 +18,8 @@
     <%- include ("partials/header.ejs") %>
     <% for(var i=0; i < videos.length; i++) { %>
       <div>
-          <a href="<%=videos[i].link%>"><%=videos[i].name%></a>
-          <p><%=videos[i].desc%></p>
+          <a href="<%=eescape(videos[i].link)%>"><%=eescape(videos[i].name)%></a>
+          <p><%=eescape(videos[i].desc)%></p>
       </div>
    <% } %>
   </body>
