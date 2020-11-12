@@ -38,7 +38,11 @@ app.use(bodyParser.urlencoded({
 app.set("view engine", "ejs");
 
 //Connect to Mongo
-dBModule.cnctDBAuth("RomlandTube")
+if(fs.existsSync("mongoauth.json")){
+  dBModule.cnctDBAuth("RomlandTube")
+}else{
+  dBModule.cnctDB("RomlandTube")
+}
 
 // GET ROUTES
 
@@ -207,7 +211,7 @@ app.post('/upload', async (_req, _res) => {
       let thumbData = file.thumb.data
 
 
-      if (checkFile(file.video, "video/", 100) && checkFile(file.thumb, "image/", 100)) {
+      if (checkFile(file.video, "video/", 100) && checkFile(file.thumb, "image/", 5)) {
         let videoExtention = mime.extension(file.video.mimetype)
         let thumbExtention = mime.extension(file.thumb.mimetype)
 

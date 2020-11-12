@@ -16,11 +16,15 @@
   </head>
   <body onload="onLoad()">
     <%- include ("partials/header.ejs") %>
+    <div id="videos">
     <% for(var i=0; i < videos.length; i++) { %>
-      <div>
-          <a href="/view?id=<%=eescape(videos[i]._id)%>"><%=eescape(videos[i].name)%></a>
-          <p><%=eescape(videos[i].desc)%></p>
+      <div class="video">
+        <a href="/view?id=<%=eescape(videos[i]._id)%>">
+          <img src="<%= eescape(videos[i].thumbLink) %>"/><br>
+          <p><%=eescape(videos[i].name)%></p>
+      </a>
       </div>
    <% } %>
+  </div>
   </body>
 </html>
