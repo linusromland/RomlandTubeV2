@@ -38,7 +38,7 @@ app.use(bodyParser.urlencoded({
 app.set("view engine", "ejs");
 
 //Connect to Mongo
-dBModule.cnctDB("RomlandTube")
+dBModule.cnctDBAuth("RomlandTube")
 
 // GET ROUTES
 
