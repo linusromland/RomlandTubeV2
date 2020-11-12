@@ -42,7 +42,7 @@ exports.findInDBOne = async (Model, toFind) => {
 }
 
 exports.findInDB = async (Model, limit) => {
-    let tmp = await Model.find({}).limit(limit)
+    let tmp = await Model.find({}).sort({ views : -1}).limit(limit)
     return tmp;
 }
 
