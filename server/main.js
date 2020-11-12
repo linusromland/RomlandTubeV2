@@ -1,3 +1,6 @@
+const { get } = require("http");
+const sharp = require("sharp");
+
 //Ipmports depedencies and others files
 const { session } = require("passport"),
   express = require("express"),
@@ -15,7 +18,7 @@ const { session } = require("passport"),
   eescape = require("escape-html"),
   upload = require('express-fileupload'),
   mime = require('mime-types'),
-  fs = require('fs')
+  fs = require('fs');
 
 
 const clientDir = __dirname + "/client/";
@@ -154,6 +157,25 @@ app.get("/upload", async (req, res) => {
   } else {
     res.redirect("/")
   }
+})
+
+app.get('/images/*', function (req, res) {
+  let pathToFile = './client/upload/' + req.path.substring(8)
+
+  console.log(req.body.size);
+
+  sharp(pathToFile)
+  .rotate()
+  .resize(parseInt(req.query.size))
+  .webp()
+  .toBuffer()
+  .then(data => {
+      res.write(data, 'binary')
+      res.end(null, 'binary')
+  }).catch((error) => {
+      res.write(error.toString())
+      res.end()
+  })
 })
 
 //if page does not exist, redirect to /
