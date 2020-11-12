@@ -20,8 +20,6 @@ const { session } = require("passport"),
 
 const clientDir = __dirname + "/client/";
 
-
-
 /*Enables JSON, Cookies, extended for express and 
 creates a static path for CSS etc */
 app.use(express.json());
@@ -33,14 +31,13 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 
-
 //Enables EJS
 app.set("view engine", "ejs");
 
 //Connect to Mongo
-if(fs.existsSync("mongoauth.json")){
+if (fs.existsSync("mongoauth.json")) {
   dBModule.cnctDBAuth("RomlandTube")
-}else{
+} else {
   dBModule.cnctDB("RomlandTube")
 }
 
@@ -92,6 +89,7 @@ app.get("/view", async (req, res) => {
   let loggedIn = false
   let name = "Not Logged in"
   let id = req.query.id;
+  dBModule.updateViews(Video, id)
   if (await logIn(req.cookies.usrName, req.cookies.pswd)) {
     loggedIn = true
     name = req.cookies.usrName
@@ -206,12 +204,13 @@ app.post("/authUser", async (req, res) => {
 app.post('/upload', async (_req, _res) => {
   if (await logIn(_req.cookies.usrName, _req.cookies.pswd)) {
     if (_req.files) {
+      
+
       let file = _req.files
-      let videoData = file.video.data
-      let thumbData = file.thumb.data
+      let videoData = _req.files.video.data
+      let thumbData = _req.files.thumb.data
 
-
-      if (checkFile(file.video, "video/", 100) && checkFile(file.thumb, "image/", 5)) {
+      if (checkFile(file.video, "video/", 150) && checkFile(file.thumb, "image/", 15)) {
         let videoExtention = mime.extension(file.video.mimetype)
         let thumbExtention = mime.extension(file.thumb.mimetype)
 
@@ -231,7 +230,7 @@ app.post('/upload', async (_req, _res) => {
             return console.log(err)
           }
         })
-        dBModule.saveToDB(createVideo(_req.body.name, _req.body.desc, goodVideoPath, goodThumbPath, file.video.mimetype , _req.cookies.usrName))
+        dBModule.saveToDB(createVideo(_req.body.name, _req.body.desc, goodVideoPath, goodThumbPath, file.video.mimetype, _req.cookies.usrName))
         _res.header('Content-Type', 'application/json');
         _res.status(200).send()
       } else {
@@ -304,7 +303,7 @@ function giveCookies(req, res) {
 }
 
 async function getVids() {
-  return await dBModule.findInDB(Video)
+  return await dBModule.findInDB(Video, 25)
 }
 
 async function getVideo(id) {

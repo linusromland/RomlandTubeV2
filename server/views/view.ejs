@@ -18,6 +18,8 @@
     <h1>View - RomlandTube</h1>
     <p> <%- eescape(vid.name) %></p>
     <p> <%- eescape(vid.desc) %> </p>
+    <p> <%- eescape(vid.channel) %> </p>
+
     <p>Views:  <%- eescape(vid.views) %> </p>
     <video width="320" height="240" controls>
         <source src="<%- vid.link %>" type="<%- vid.mime %>">

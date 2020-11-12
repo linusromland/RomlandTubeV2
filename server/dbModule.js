@@ -1,4 +1,5 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose'),
+    ObjectID = require("mongodb").ObjectID
 let db;
 
 //Connect to MongoDB With Authentication. 
@@ -37,21 +38,23 @@ exports.cnctDB = (collectionname) => {
 
 //Finds "toFind" in Database on the Model provided
 exports.findInDBOne = async (Model, toFind) => {
-    return await Model.findOne({name: toFind})
+    return await Model.findOne({ name: toFind })
 }
 
-exports.findInDB = async (Model) => {
-   let tmp = await Model.find({})
-   return tmp;
+exports.findInDB = async (Model, limit) => {
+    let tmp = await Model.find({}).limit(limit)
+    return tmp;
 }
 
 exports.findVideoWithID = async (Model, toFind) => {
-    let tmp = await Model.findOne({_id: toFind})
+    let tmp = await Model.findOne({ _id: toFind })
     console.log(tmp)
     return tmp
 }
 
-
+exports.updateViews = async (Model, id) => {
+    await Model.update({_id: ObjectID(id)}, {$inc:{views:1}});
+}
 
 //takes input with type Model. Saves that model in Database. Cant be used before cnctDB or cnctDBAuth.
 exports.saveToDB = (input) => {

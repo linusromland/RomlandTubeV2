@@ -1,15 +1,95 @@
 <html>
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload - RomlandTube</title>
+
+    <!--Import of CSS-->
+    <link rel="stylesheet" href="/CSS/main.css" />
+    <link rel="stylesheet" id="customCSS" />
+
+    <!--Import of Local JavaScript-->
     <script src="/js/global.js"></script>
+    <script src="/js/index.js"></script>
+    <script>
+
+      function sendData(form) {
+        const XHR = new XMLHttpRequest();
+
+        // Bind the FormData object and the form element
+        const FD = new FormData(form);
+
+        // Define what happens on successful data submission
+        XHR.addEventListener("load", function (event) {
+          alert("event.target.responseText");
+        });
+
+        // Define what happens in case of error
+        XHR.addEventListener("error", function (event) {
+          alert("Oops! Something went wrong.");
+        });
+
+        XHR.upload.onprogress = function(e) {
+          document.getElementById("Progress").innerHTML = (e.loaded / e.total * 100).toFixed(1)
+        }
+
+        // Set up our request
+        XHR.open("POST", "/upload");
+
+        // The data sent is what the user provided in the form
+        XHR.send(FD);
+      }
+
+      function loadEd() {
+        onLoad();
+        document.getElementById( "myForm" ).addEventListener( "submit", function (event) {
+        event.returnValue = false;
+
+        sendData(document.getElementById( "myForm" ));
+
+      });
+      }
+      
+    </script>
   </head>
-  <body onload="onLoad()">
-    <%- include ("partials/header.ejs") %> 
-    <form method="POST" action="/upload" enctype="multipart/form-data">
-      <input type="text" name="name" placeholder="Video Name" maxlength="25" required/>
-      <input type="text" name="desc" placeholder="Description" maxlength="150" required />
-      <input type="file" name="video" accept="video/*" placeholder="Video" required />
-      <input type="file" name="thumb" accept="image/*" placeholder="Thumbnail" required />
-      <input type="submit" value="Upload" />
+  <body onload="loadEd()">
+    <%- include ("partials/header.ejs") %>
+    <form id="myForm" method="POST" enctype="multipart/form-data">
+      <input
+        id="name"
+        type="text"
+        name="name"
+        placeholder="Video Name"
+        maxlength="25"
+        required
+      />
+      <input
+        id="desc"
+        type="text"
+        name="desc"
+        placeholder="Description"
+        maxlength="150"
+        required
+      />
+      <input
+        id="video"
+        type="file"
+        name="video"
+        accept="video/*"
+        placeholder="Video"
+        required
+      />
+      <input
+        id="thumb"
+        type="file"
+        name="thumb"
+        accept="image/*"
+        placeholder="Thumbnail"
+        required
+      />
+      <input id="name" type="submit" value="Upload" />
+      <p id="Progress"></p>
     </form>
   </body>
 </html>
+<!--Cursor parking lot[             ]-->
