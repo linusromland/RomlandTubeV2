@@ -8,8 +8,8 @@ const { session } = require("passport"),
   expressSession = require('express-session'),
   app = express(),
   port = 3000,
-  UserSchema = require("./models/UserSchema.js"),
-  VideoSchema = require("./models/VideoSchema.js"),
+  User = require("./models/User.js"),
+  Video = require("./models/Video.js"),
   dBModule = require('./dbModule'),
   cookieParser = require("cookie-parser"),
   eescape = require("escape-html"),
@@ -20,9 +20,7 @@ const { session } = require("passport"),
 
 const clientDir = __dirname + "/client/";
 
-//Creates the User and Video Object
-const User = mongoose.model("User", UserSchema);
-const Video = mongoose.model("Video", VideoSchema);
+
 
 /*Enables JSON, Cookies, extended for express and 
 creates a static path for CSS etc */
@@ -84,6 +82,32 @@ app.get("/login", async (req, res) => {
       });
     });
   }
+});
+
+app.get("/view", async (req, res) => {
+  let loggedIn = false
+  let name = "Not Logged in"
+  let id = req.query.id;
+  if (await logIn(req.cookies.usrName, req.cookies.pswd)) {
+    loggedIn = true
+    name = req.cookies.usrName
+  }
+
+  fs.readdir(clientDir + "/themes", async function (err, files) {
+    //handling error
+    if (err) {
+      return console.log('Unable to find or open the directory: ' + err);
+    }
+    let video = await getVideo(id)
+    res.render("view", {
+      loggedIn: loggedIn,
+      name: name,
+      files: files,
+      vid: video,
+      eescape: eescape,
+    });
+  });
+
 });
 
 app.get("/register", async (req, res) => {
@@ -179,9 +203,7 @@ app.post('/upload', async (_req, _res) => {
   if (await logIn(_req.cookies.usrName, _req.cookies.pswd)) {
     if (_req.files) {
       let file = _req.files
-      let videoName = file.video.name
       let videoData = file.video.data
-      let thumbName = file.thumb.name
       let thumbData = file.thumb.data
 
 
@@ -191,8 +213,10 @@ app.post('/upload', async (_req, _res) => {
 
         let videoName = file.video.md5 + "." + videoExtention
         let videoPath = clientDir + "upload/videos/" + videoName
+        let goodVideoPath = "upload/videos/" + videoName
         let thumbName = file.video.md5 + "." + thumbExtention
         let thumbPath = clientDir + "upload/thumbnails/" + thumbName
+        let goodThumbPath = "upload/thumbnails/" + thumbName
         fs.writeFile(videoPath, videoData, function (err) {
           if (err) {
             return console.log(err)
@@ -203,7 +227,7 @@ app.post('/upload', async (_req, _res) => {
             return console.log(err)
           }
         })
-        dBModule.saveToDB(createVideo(_req.body.name, _req.body.desc, videoPath, thumbPath, _req.cookies.usrName))
+        dBModule.saveToDB(createVideo(_req.body.name, _req.body.desc, goodVideoPath, goodThumbPath, file.video.mimetype , _req.cookies.usrName))
         _res.header('Content-Type', 'application/json');
         _res.status(200).send()
       } else {
@@ -231,7 +255,7 @@ function createUser(nameIN, passIN) {
   return tmp;
 }
 
-function createVideo(name, desc, link, thumbLink, channel) {
+function createVideo(name, desc, link, thumbLink, mimein, channel) {
   name = name.substring(0, 25)
   desc = desc.substring(0, 150)
 
@@ -241,6 +265,7 @@ function createVideo(name, desc, link, thumbLink, channel) {
     link: link,
     thumbLink: thumbLink,
     channel: channel,
+    mime: mimein
   });
   return tmp;
 }
@@ -276,6 +301,10 @@ function giveCookies(req, res) {
 
 async function getVids() {
   return await dBModule.findInDB(Video)
+}
+
+async function getVideo(id) {
+  return await dBModule.findVideoWithID(Video, id)
 }
 
 function checkFile(file, wantedType, wantedSize) {

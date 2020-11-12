@@ -30,7 +30,7 @@ exports.cnctDB = (collectionname) => {
     db = mongoose.connection;
     db.on('error', console.error.bind(console, 'connection error:'));
     db.once('open', function () {
-        console.log("Connected to MongoDB using collection " + collectionname)
+        console.log("Connected to MongoDB using " + collectionname)
     });
 
 }
@@ -44,6 +44,14 @@ exports.findInDB = async (Model) => {
    let tmp = await Model.find({})
    return tmp;
 }
+
+exports.findVideoWithID = async (Model, toFind) => {
+    let tmp = await Model.findOne({_id: toFind})
+    console.log(tmp)
+    return tmp
+}
+
+
 
 //takes input with type Model. Saves that model in Database. Cant be used before cnctDB or cnctDBAuth.
 exports.saveToDB = (input) => {

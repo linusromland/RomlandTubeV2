@@ -26,10 +26,16 @@ const VideoSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    mime: {
+        type: String,
+        required: true
+    },
     date: {
         type: Date,
         default: Date.now
     }
 });
 
-module.exports = VideoSchema;
+const Video = mongoose.model("Video", VideoSchema);
+
+module.exports = Video;
