@@ -18,7 +18,8 @@ const { session } = require("passport"),
   eescape = require("escape-html"),
   upload = require("express-fileupload"),
   mime = require("mime-types"),
-  fs = require("fs");
+  fs = require("fs"),
+  probe = require("probe-image-size");
 
 const clientDir = __dirname + "/client/";
 
@@ -158,14 +159,17 @@ app.get("/upload", async (req, res) => {
   }
 });
 
-app.get("/images/*", function (req, res) {
+app.get("/images/*", async function (req, res) {
   let pathToFile = "./client/upload/" + req.path.substring(8);
 
-  console.log(req.body.size);
+  let originalSize = await probe(fs.createReadStream(pathToFile));
 
+  let width = originalSize.width
+
+  //Scale image
   sharp(pathToFile)
     .rotate()
-    .resize(parseInt(req.query.size))
+    .resize(Math.min(req.query.size, width) , Math.round(Math.min(parseInt(req.query.size), width) * (9 / 16)))
     .webp()
     .toBuffer()
     .then((data) => {
