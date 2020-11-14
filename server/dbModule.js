@@ -46,6 +46,13 @@ exports.findInDB = async (Model, limit) => {
     return tmp;
 }
 
+exports.searchInDB = async (Model, limit, search) => {
+    const regex = new RegExp(escapeRegex(search), 'gi');
+    let tmp = await Model.find({ 
+        $and: [{ $or: [{ "name": regex }, { "desc": regex }] }] }).sort({ views : -1}).limit(limit)
+    return tmp;
+}
+
 exports.findVideoWithID = async (Model, toFind) => {
     let tmp = await Model.findOne({ _id: toFind })
     console.log(tmp)
@@ -62,3 +69,8 @@ exports.saveToDB = (input) => {
         console.log(`Successfully saved ${input} to the database!`)
     })
 }
+
+function escapeRegex(text) {
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+  };
+  

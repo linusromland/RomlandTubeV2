@@ -160,6 +160,11 @@ app.get("/upload", async (req, res) => {
   }
 });
 
+app.get("/api", async function (req, res) {
+  let search = req.query.search ? req.query.search : "";
+  res.send(await searchVids(search));
+});
+
 app.get("/images/*", async function (req, res) {
   let pathToFile = "./client/upload/" + req.path.substring(8);
 
@@ -167,7 +172,7 @@ app.get("/images/*", async function (req, res) {
 
   let width = originalSize.width;
 
-  //Scale image
+  //Scale imageapp.get("/images/*", async function (req, res) {
   sharp(pathToFile)
     .rotate()
     .resize(
@@ -358,6 +363,10 @@ function giveCookies(req, res) {
 
 async function getVids() {
   return await dBModule.findInDB(Video, 25);
+}
+
+async function searchVids(search) {
+  return await dBModule.searchInDB(Video, 1, search);
 }
 
 async function getVideo(id) {
