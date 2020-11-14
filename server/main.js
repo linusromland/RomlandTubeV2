@@ -257,7 +257,7 @@ app.post("/upload", async (_req, _res) => {
           }
           ffmpeg(videoPath)
             // Generate 1080P video
-            .output("./client/upload/scaledVideos/" + videoName)
+            .output("./client/upload/scaledVideos/" + file.video.md5 + ".mp4")
             .videoCodec("libx264")
             .size("1920x1080")
 
