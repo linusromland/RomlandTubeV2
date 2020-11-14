@@ -48,8 +48,17 @@ exports.findInDB = async (Model, limit) => {
 
 exports.searchInDB = async (Model, limit, search) => {
     const regex = new RegExp(escapeRegex(search), 'gi');
-    let tmp = await Model.find({ 
-        $and: [{ $or: [{ "name": regex }, { "desc": regex }] }] }).sort({ views : -1}).limit(limit)
+
+    let tmp;
+    
+    try {
+        tmp = await Model.find({ 
+            $and: [{ $or: [{ _id: ObjectID(search) }] }] }).sort({ views : -1}).limit(limit)
+    } catch (error) {
+        tmp = await Model.find({ 
+            $and: [{ $or: [{ "name": regex }, { "desc": regex }] }] }).sort({ views : -1}).limit(limit)
+    }
+    
     return tmp;
 }
 

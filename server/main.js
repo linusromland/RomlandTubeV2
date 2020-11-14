@@ -62,13 +62,25 @@ app.get("/", (req, res) => {
       return console.log("Unable to find or open the directory: " + err);
     }
 
-    res.render("index", {
-      name: name,
-      loggedIn: loggedin,
-      videos: await getVids(),
-      eescape: eescape,
-      files: files,
-    });
+    if(req.query.search){
+      res.render("index", {
+        name: name,
+        loggedIn: loggedin,
+        videos: await searchVids(req.query.search),
+        eescape: eescape,
+        files: files,
+      });
+    } else {
+      res.render("index", {
+        name: name,
+        loggedIn: loggedin,
+        videos: await getVids(),
+        eescape: eescape,
+        files: files,
+      });
+    }
+
+    
   });
 });
 

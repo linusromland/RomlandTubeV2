@@ -12,10 +12,19 @@
     <!--Import of Local JavaScript-->
     <script src="/js/global.js"></script>
     <script src="/js/index.js"></script>
+
+    <script>
+      async function search() {
+        window.location = "/?search=" + document.getElementById("searchBar").value;
+      }
+    </script>
     
   </head>
   <body onload="onLoad()">
     <%- include ("partials/header.ejs") %>
+    <form onsubmit="search(); return false;"> 
+      <input id="searchBar" type="text">
+    </form>
     <div id="videos">
     <% for(var i=0; i < videos.length; i++) { %>
       <div class="video">
