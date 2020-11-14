@@ -19,7 +19,8 @@ const { session } = require("passport"),
   upload = require("express-fileupload"),
   mime = require("mime-types"),
   fs = require("fs"),
-  probe = require("probe-image-size");
+  probe = require("probe-image-size"),
+  ffmpeg = require("fluent-ffmpeg");
 
 const clientDir = __dirname + "/client/";
 
@@ -164,12 +165,15 @@ app.get("/images/*", async function (req, res) {
 
   let originalSize = await probe(fs.createReadStream(pathToFile));
 
-  let width = originalSize.width
+  let width = originalSize.width;
 
   //Scale image
   sharp(pathToFile)
     .rotate()
-    .resize(Math.min(req.query.size, width) , Math.round(Math.min(parseInt(req.query.size), width) * (9 / 16)))
+    .resize(
+      Math.min(req.query.size, width),
+      Math.round(Math.min(parseInt(req.query.size), width) * (9 / 16))
+    )
     .webp()
     .toBuffer()
     .then((data) => {
@@ -243,7 +247,7 @@ app.post("/upload", async (_req, _res) => {
 
         let videoName = file.video.md5 + "." + videoExtention;
         let videoPath = clientDir + "upload/videos/" + videoName;
-        let goodVideoPath = "upload/videos/" + videoName;
+        let goodVideoPath = "upload/scaledVideos/" + videoName;
         let thumbName = file.video.md5 + "." + thumbExtention;
         let thumbPath = clientDir + "upload/thumbnails/" + thumbName;
         let goodThumbPath = "upload/thumbnails/" + thumbName;
@@ -251,6 +255,22 @@ app.post("/upload", async (_req, _res) => {
           if (err) {
             return console.log(err);
           }
+          ffmpeg(videoPath)
+            // Generate 1080P video
+            .output("./client/upload/scaledVideos/" + videoName)
+            .videoCodec("libx264")
+            .size("1920x1080")
+
+            .on("error", function (err) {
+              console.log("An error occurred: " + err.message);
+            })
+            .on("progress", function (progress) {
+              console.log("... frames: " + progress.frames);
+            })
+            .on("end", function () {
+              console.log("Finished processing");
+            })
+            .run();
         });
         fs.writeFile(thumbPath, thumbData, function (err) {
           if (err) {
