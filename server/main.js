@@ -247,7 +247,7 @@ app.post("/upload", async (_req, _res) => {
 
         let videoName = file.video.md5 + "." + videoExtention;
         let videoPath = clientDir + "upload/videos/" + videoName;
-        let goodVideoPath = "upload/scaledVideos/" + videoName;
+        let goodVideoPath = "upload/scaledVideos/" + file.video.md5 + ".mp4";
         let thumbName = file.video.md5 + "." + thumbExtention;
         let thumbPath = clientDir + "upload/thumbnails/" + thumbName;
         let goodThumbPath = "upload/thumbnails/" + thumbName;
@@ -283,7 +283,7 @@ app.post("/upload", async (_req, _res) => {
             _req.body.desc,
             goodVideoPath,
             goodThumbPath,
-            file.video.mimetype,
+            "video/mp4",
             _req.cookies.usrName
           )
         );
