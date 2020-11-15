@@ -1,3 +1,4 @@
+const { constants } = require("crypto");
 const { get } = require("http");
 const sharp = require("sharp");
 
@@ -62,7 +63,7 @@ app.get("/", (req, res) => {
       return console.log("Unable to find or open the directory: " + err);
     }
 
-    if(req.query.search){
+    if (req.query.search) {
       res.render("index", {
         name: name,
         loggedIn: loggedin,
@@ -79,8 +80,6 @@ app.get("/", (req, res) => {
         files: files,
       });
     }
-
-    
   });
 });
 
@@ -106,7 +105,6 @@ app.get("/view", async (req, res) => {
   let loggedIn = false;
   let name = "Not Logged in";
   let id = req.query.id;
-  dBModule.updateViews(Video, id);
   if (await logIn(req.cookies.usrName, req.cookies.pswd)) {
     loggedIn = true;
     name = req.cookies.usrName;
@@ -117,14 +115,41 @@ app.get("/view", async (req, res) => {
     if (err) {
       return console.log("Unable to find or open the directory: " + err);
     }
-    let video = await getVideo(id);
-    res.render("view", {
-      loggedIn: loggedIn,
-      name: name,
-      files: files,
-      vid: video,
-      eescape: eescape,
-    });
+    if (mongoose.isValidObjectId(id)) {
+      let video = await getVideo(id);
+      fs.access("./client/" + video.link, fs.constants.R_OK, async (err) => {
+        if (err) {
+          console.log(err);
+          res.render("unavailable", {
+            reason: "Video has not started prossesing"
+          });
+        } else {
+          var d = new Date();
+          var n = d.getTime();
+          if (
+            n - fs.statSync("./client/" + video.link).mtime.getTime() >
+            5000
+          ) {
+            dBModule.updateViews(Video, id);
+            res.render("view", {
+              loggedIn: loggedIn,
+              name: name,
+              files: files,
+              vid: video,
+              eescape: eescape,
+            });
+          } else {
+            res.render("unavailable", {
+              reason: "Video is still prossesing"
+            });
+          }
+        }
+      });
+    } else {
+      res.render("unavailable", {
+        reason: "Invalid video id"
+      });
+    }
   });
 });
 
