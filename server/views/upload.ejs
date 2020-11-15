@@ -36,10 +36,14 @@
             ((e.loaded - d0) * 0.00000095367432) /
             ((performance.now() - t0) / 1000);
 
+          let timeLeft = ((e.total - e.loaded) * 0.00000095367432) / MBps;
+
+          let timeLeftHumanReadble = timeLeft > 60 ? (timeLeft / 60).toFixed(1) + "m" : timeLeft.toFixed(1) + "s"
+
           document.getElementById("Progress").innerHTML = (
             (e.loaded / e.total) *
             100
-          ).toFixed(1).toString() + "% <br> (" + MBps.toFixed(1) + " MB/s)";
+          ).toFixed(1).toString() + "% <br> " + MBps.toFixed(1) + " MB/s <br> " + timeLeftHumanReadble;
 
           t0 = performance.now();
           d0 = e.loaded;
