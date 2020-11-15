@@ -12,8 +12,10 @@
     <script src="/js/global.js"></script>
     <script src="/js/index.js"></script>
     <script>
-
       function sendData(form) {
+        let t0 = 0;
+        let d0 = 0;
+
         const XHR = new XMLHttpRequest();
 
         // Bind the FormData object and the form element
@@ -29,9 +31,19 @@
           alert("Oops! Something went wrong.");
         });
 
-        XHR.upload.onprogress = function(e) {
-          document.getElementById("Progress").innerHTML = (e.loaded / e.total * 100).toFixed(1)
-        }
+        XHR.upload.onprogress = function (e) {
+          let MBps =
+            ((e.loaded - d0) * 0.00000095367432) /
+            ((performance.now() - t0) / 1000);
+
+          document.getElementById("Progress").innerHTML = (
+            (e.loaded / e.total) *
+            100
+          ).toFixed(1).toString() + "% <br> (" + MBps.toFixed(1) + " MB/s)";
+
+          t0 = performance.now();
+          d0 = e.loaded;
+        };
 
         // Set up our request
         XHR.open("POST", "/upload");
@@ -42,14 +54,14 @@
 
       function loadEd() {
         onLoad();
-        document.getElementById( "myForm" ).addEventListener( "submit", function (event) {
-        event.returnValue = false;
+        document
+          .getElementById("myForm")
+          .addEventListener("submit", function (event) {
+            event.returnValue = false;
 
-        sendData(document.getElementById( "myForm" ));
-
-      });
+            sendData(document.getElementById("myForm"));
+          });
       }
-      
     </script>
   </head>
   <body onload="loadEd()">
