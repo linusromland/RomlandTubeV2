@@ -105,52 +105,69 @@ app.get("/view", async (req, res) => {
   let loggedIn = false;
   let name = "Not Logged in";
   let id = req.query.id;
-  if (await logIn(req.cookies.usrName, req.cookies.pswd)) {
-    loggedIn = true;
-    name = req.cookies.usrName;
-  }
 
-  fs.readdir(clientDir + "/themes", async function (err, files) {
-    //handling error
-    if (err) {
-      return console.log("Unable to find or open the directory: " + err);
+  if (id) {
+    if (await logIn(req.cookies.usrName, req.cookies.pswd)) {
+      loggedIn = true;
+      name = req.cookies.usrName;
     }
-    if (mongoose.isValidObjectId(id)) {
-      let video = await getVideo(id);
-      fs.access("./client/" + video.link, fs.constants.R_OK, async (err) => {
-        if (err) {
-          console.log(err);
+
+    fs.readdir(clientDir + "/themes", async function (err, files) {
+      //handling error
+      if (err) {
+        return console.log("Unable to find or open the directory: " + err);
+      }
+      if (mongoose.isValidObjectId(id)) {
+        try {
+          let video = await getVideo(id);
+          fs.access(
+            "./client/" + video.link,
+            fs.constants.R_OK,
+            async (err) => {
+              if (err) {
+                console.log(err);
+                res.render("unavailable", {
+                  reason: "Video has not started processing",
+                });
+              } else {
+                var d = new Date();
+                var n = d.getTime();
+                if (
+                  n - fs.statSync("./client/" + video.link).mtime.getTime() >
+                  5000
+                ) {
+                  dBModule.updateViews(Video, id);
+                  res.render("view", {
+                    loggedIn: loggedIn,
+                    name: name,
+                    files: files,
+                    vid: video,
+                    eescape: eescape,
+                  });
+                } else {
+                  res.render("unavailable", {
+                    reason: "Video is still processing",
+                  });
+                }
+              }
+            }
+          );
+        } catch {
           res.render("unavailable", {
-            reason: "Video has not started prossesing"
+            reason: "Invalid video id",
           });
-        } else {
-          var d = new Date();
-          var n = d.getTime();
-          if (
-            n - fs.statSync("./client/" + video.link).mtime.getTime() >
-            5000
-          ) {
-            dBModule.updateViews(Video, id);
-            res.render("view", {
-              loggedIn: loggedIn,
-              name: name,
-              files: files,
-              vid: video,
-              eescape: eescape,
-            });
-          } else {
-            res.render("unavailable", {
-              reason: "Video is still prossesing"
-            });
-          }
         }
-      });
-    } else {
-      res.render("unavailable", {
-        reason: "Invalid video id"
-      });
-    }
-  });
+      } else {
+        res.render("unavailable", {
+          reason: "Invalid video id",
+        });
+      }
+    });
+  } else {
+    res.render("unavailable", {
+      reason: "Invalid video id",
+    });
+  }
 });
 
 app.get("/register", async (req, res) => {
@@ -303,11 +320,23 @@ app.post("/upload", async (_req, _res) => {
             .videoCodec("libx264")
             .size("1920x1080")
 
+            .output(
+              "./client/upload/scaledVideos/" + file.video.md5 + "-720p.mp4"
+            )
+            .videoCodec("libx264")
+            .size("1280x720") 
+
+            .output(
+              "./client/upload/scaledVideos/" + file.video.md5 + "-360p.mp4"
+            )
+            .videoCodec("libx264")
+            .size("640x360")
+
             .on("error", function (err) {
               console.log("An error occurred: " + err.message);
             })
             .on("progress", function (progress) {
-              console.log("... frames: " + progress.frames);
+              console.log("frames: " + progress.frames);
             })
             .on("end", function () {
               console.log("Finished processing");
