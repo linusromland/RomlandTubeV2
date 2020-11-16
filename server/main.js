@@ -1,15 +1,9 @@
-const { constants } = require("crypto");
-const { get } = require("http");
-const sharp = require("sharp");
+const { fileURLToPath } = require("url");
 
 //Ipmports depedencies and others files
-const { session } = require("passport"),
-  express = require("express"),
+const express = require("express"),
   bodyParser = require("body-parser"),
-  passportLocalMongoose = require("passport-local-mongoose"),
-  passport = require("passport"),
   mongoose = require("mongoose"),
-  expressSession = require("express-session"),
   app = express(),
   port = 3000,
   User = require("./models/User.js"),
@@ -21,7 +15,9 @@ const { session } = require("passport"),
   mime = require("mime-types"),
   fs = require("fs"),
   probe = require("probe-image-size"),
-  ffmpeg = require("fluent-ffmpeg");
+  ffmpeg = require("fluent-ffmpeg"),
+  mkdirp = require("mkdirp"),
+  sharp = require("sharp");
 
 const clientDir = __dirname + "/client/";
 
@@ -314,34 +310,7 @@ app.post("/upload", async (_req, _res) => {
           if (err) {
             return console.log(err);
           }
-          ffmpeg(videoPath)
-            // Generate 1080P video
-            .output("./client/upload/scaledVideos/" + file.video.md5 + ".mp4")
-            .videoCodec("libx264")
-            .size("1920x1080")
-
-            .output(
-              "./client/upload/scaledVideos/" + file.video.md5 + "-720p.mp4"
-            )
-            .videoCodec("libx264")
-            .size("1280x720") 
-
-            .output(
-              "./client/upload/scaledVideos/" + file.video.md5 + "-360p.mp4"
-            )
-            .videoCodec("libx264")
-            .size("640x360")
-
-            .on("error", function (err) {
-              console.log("An error occurred: " + err.message);
-            })
-            .on("progress", function (progress) {
-              console.log("frames: " + progress.frames);
-            })
-            .on("end", function () {
-              console.log("Finished processing");
-            })
-            .run();
+          scaleVideo(videoPath, file);
         });
         fs.writeFile(thumbPath, thumbData, function (err) {
           if (err) {
@@ -396,6 +365,36 @@ function createVideo(name, desc, link, thumbLink, mimein, channel) {
     mime: mimein,
   });
   return tmp;
+}
+
+let codec = "libx264";
+let resolutions = ["1920x1080", "1280x720", "100x100"];
+
+function scaleVideo(videoPath, file) {
+  let ff = ffmpeg(videoPath);
+
+  let outpath = "./client/upload/scaledVideos/" + file.video.md5;
+
+  //Create folder
+  fs.mkdirSync(outpath, { recursive: true })
+
+  for (let i = 0; i < resolutions.length; i++) {
+    ff.addOutput(outpath + "/" + resolutions[i] + ".mp4")
+      .videoCodec(codec)
+      .size(resolutions[i]);
+  }
+  ff.on("error", function (err) {
+    console.log("An error occurred: " + err.message);
+  })
+    .on("progress", function (progress) {
+      console.log("frames: " + progress.frames);
+    })
+    .on("end", function () {
+      console.log("Finished processing");
+    })
+    .run();
+
+  return ff;
 }
 
 async function logIn(username, password) {
