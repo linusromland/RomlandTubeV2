@@ -1,6 +1,4 @@
-const { fileURLToPath } = require("url");
-
-//Ipmports depedencies and others files
+//Imports depedencies and others files
 const express = require("express"),
   bodyParser = require("body-parser"),
   mongoose = require("mongoose"),
@@ -17,9 +15,9 @@ const express = require("express"),
   probe = require("probe-image-size"),
   ffmpeg = require("fluent-ffmpeg"),
   mkdirp = require("mkdirp"),
-  sharp = require("sharp");
-
-const clientDir = __dirname + "/client/";
+  sharp = require("sharp"),
+  { fileURLToPath } = require("url"),
+  clientDir = __dirname + "/client/";
 
 /*Enables JSON, Cookies, extended for express and 
 creates a static path for CSS etc */
