@@ -14,7 +14,7 @@ const VideoSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    thumbLink: {
+    thumbEnd: {
         type: String,
         required: true
     },
@@ -26,26 +26,18 @@ const VideoSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    mime: {
-        type: String,
-        required: true
-    },
     comments: {
         name: {
-            type: String,
-            required: true
+            type: String
         },
         comment: {
-            type: String,
-            required: true
+            type: String
         },
         date: {
-            type: Date,
-            required: true
+            type: Date
         },
         likes: {
-            type: Number,
-            required: true
+            type: Number
         }
     },
     date: {
