@@ -65,17 +65,15 @@ exports.searchInDB = async (Model, limit, search) => {
 }
 
 exports.findVideoWithID = async (Model, toFind) => {
-    let tmp = await Model.findOne({ _id: toFind })
-    console.log(tmp)
-    return tmp
+    return await Model.findOne({ _id: toFind })
 }
 
 exports.updateViews = async (Model, id) => {
-    await Model.update({ _id: ObjectID(id) }, { $inc: { views: 1 } });
+    await Model.updateOne({ _id: ObjectID(id) }, { $inc: { views: 1 } });
 }
 
 exports.addComment = async (Model, id, Comment) => {
-    await Model.findOneAndUpdate({ _id: ObjectID(id) }, { $push: { comments: Comment } });
+    await Model.updateOne({ _id: ObjectID(id) }, { $push: { comments: Comment } });
 }
 
 //takes input with type Model. Saves that model in Database. Cant be used before cnctDB or cnctDBAuth.
