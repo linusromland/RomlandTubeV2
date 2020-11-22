@@ -39,13 +39,13 @@ const VideoSchema = new mongoose.Schema({
             type: String,
             required: true
         },
-        likes: {
-            type: Number,
-            default: 0
-        },
         date: {
             type: Date,
-            default: Date.now
+            required: true
+        },
+        likes: {
+            type: Number,
+            required: true
         }
     },
     date: {

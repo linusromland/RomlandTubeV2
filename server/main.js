@@ -367,7 +367,7 @@ function createVideo(name, desc, link, thumbLink, mimein, channel) {
 }
 
 function createComment(id, comment, user) {
-  let tmp = {name: user, comment: comment}
+  let tmp = {name: user, comment: comment, likes: 0, date: Date.now()}
   dBModule.addComment(Video, id, tmp);
 }
 
