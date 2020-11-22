@@ -217,7 +217,7 @@ app.get("/api", async function (req, res) {
 });
 
 app.get("/images/*", async function (req, res) {
-  let pathToFile = "." + req.path.substring(8);
+  let pathToFile = "." + req.path.substring(7);
 
   let originalSize = await probe(fs.createReadStream(pathToFile));
 
