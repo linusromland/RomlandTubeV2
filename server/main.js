@@ -133,11 +133,13 @@ app.get("/view", async (req, res) => {
                   5000
                 ) {
                   dBModule.updateViews(Video, id);
+
                   res.render("view", {
                     loggedIn: loggedIn,
                     name: name,
                     files: files,
                     vid: video,
+                    comments: video.comments.toJSON(),
                     eescape: eescape,
                   });
                 } else {

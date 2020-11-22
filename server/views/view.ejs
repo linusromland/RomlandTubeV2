@@ -31,7 +31,7 @@
           "application/x-www-form-urlencoded"
         );
 
-        let comment = "Very good comment";
+        let comment = document.getElementById("comment").value;
         request.send(`id=${getURLParameter("id")}&comment=${comment}`);
         request.onreadystatechange = function () {
           if (request.status == 201) {
@@ -54,10 +54,14 @@
       Your browser does not support the video tag.
     </video>
 
-    <% /*vid.comments.forEach(comment => { */%>
-      <p><%- vid.comments %></p>
-    <%/* }) */%>
-
+    <input id="comment" type="text">
     <button onclick="addComment()">Add comment</button>
+    <% if (comments.length) { %>
+      <% comments.forEach(comment => { %>
+        <p><%- eescape(comment.name) %></p>
+        <p><%- eescape(comment.comment) %></p>
+        <p><%- eescape(comment.likes) %></p>
+      <% }) %>
+    <% } %> 
   </body>
 </html>
