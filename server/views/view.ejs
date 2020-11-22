@@ -50,7 +50,7 @@
 
     <p>Views: <%- eescape(vid.views) %></p>
     <video width="320" height="240" controls>
-      <source src="<%- vid.link %>" type="<%- vid.mime %>" />
+      <source src="<%- vid.link.substring(7) %>/1920x1080.mp4" type="video/mp4" />
       Your browser does not support the video tag.
     </video>
 
