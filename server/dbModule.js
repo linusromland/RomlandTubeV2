@@ -78,8 +78,9 @@ exports.addComment = async (Model, id, Comment) => {
 
 //takes input with type Model. Saves that model in Database. Cant be used before cnctDB or cnctDBAuth.
 exports.saveToDB = (input) => {
-    input.save(() => {
-        console.log(`Successfully saved ${input} to the database!`)
+    input.save((error, sucess) => {
+        if (sucess) console.log(`Successfully saved ${input} to the database!`)
+        if(error) console.error(error);
     })
 }
 

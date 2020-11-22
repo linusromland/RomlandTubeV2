@@ -29,7 +29,7 @@
     <% for(var i=0; i < videos.length; i++) { %>
       <div class="video">
         <a href="/view?id=<%=eescape(videos[i]._id)%>">
-          <img loading="lazy" src="<%- eescape("/images/" + videos[i].thumbLink.substring(7)) + "?size=500"%>" width="500"/><br>
+          <img loading="lazy" src="<%- eescape("/images" + videos[i].link) + "/thumbnail." + videos[i].thumbEnd +"?size=500"%>" width="500"/><br>
           <p><%- eescape(videos[i].name)%></p>
       </a>
       </div>

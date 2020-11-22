@@ -116,8 +116,7 @@ app.get("/view", async (req, res) => {
         try {
           let video = await getVideo(id);
 
-          fs.access(
-            "./client/" + video.link,
+          fs.access("." + video.link + "/1920x1080.mp4",
             fs.constants.R_OK,
             async (err) => {
               if (err) {
@@ -129,7 +128,7 @@ app.get("/view", async (req, res) => {
                 var d = new Date();
                 var n = d.getTime();
                 if (
-                  n - fs.statSync("./client/" + video.link).mtime.getTime() >
+                  n - fs.statSync("." + video.link).mtime.getTime() >
                   5000
                 ) {
                   dBModule.updateViews(Video, id);
@@ -218,7 +217,7 @@ app.get("/api", async function (req, res) {
 });
 
 app.get("/images/*", async function (req, res) {
-  let pathToFile = "./client/upload/" + req.path.substring(8);
+  let pathToFile = "." + req.path.substring(7);
 
   let originalSize = await probe(fs.createReadStream(pathToFile));
 
@@ -309,19 +308,20 @@ app.post("/upload", async (_req, _res) => {
         checkFile(file.thumb, "image/", 15)
       ) {
         let videoExtention = mime.extension(file.video.mimetype);
-        let thumbExtention = mime.extension(file.thumb.mimetype);
-
-        let videoName = file.video.md5 + "." + videoExtention;
-        let videoPath = clientDir + "upload/videos/" + videoName;
-        let goodVideoPath = "upload/scaledVideos/" + file.video.md5 + ".mp4";
-        let thumbName = file.video.md5 + "." + thumbExtention;
-        let thumbPath = clientDir + "upload/thumbnails/" + thumbName;
-        let goodThumbPath = "upload/thumbnails/" + thumbName;
+        let thumbEnd = mime.extension(file.thumb.mimetype);
+        let outpath = "./client/upload/" + _req.cookies.usrName + "-" + file.video.md5;
+        let videoName = _req.cookies.usrName + "-" + file.video.md5 + "." + videoExtention;
+        let videoPath = clientDir + "upload/" + videoName;
+        let thumbPath = outpath + "/thumbnail." + thumbEnd
+        //Create folder
+        fs.mkdirSync(outpath, { recursive: true })
+        //console.log(videoPath)
         fs.writeFile(videoPath, videoData, function (err) {
           if (err) {
-            return console.log(err);
+            console.error(err);
+            return;
           }
-          scaleVideo(videoPath, file);
+          scaleVideo(videoPath, file, outpath);
         });
         fs.writeFile(thumbPath, thumbData, function (err) {
           if (err) {
@@ -332,9 +332,8 @@ app.post("/upload", async (_req, _res) => {
           createVideo(
             _req.body.name,
             _req.body.desc,
-            goodVideoPath,
-            goodThumbPath,
-            "video/mp4",
+            outpath.substring(1),
+            thumbEnd,
             _req.cookies.usrName
           )
         );
@@ -363,7 +362,7 @@ function createUser(nameIN, passIN) {
   return tmp;
 }
 
-function createVideo(name, desc, link, thumbLink, mimein, channel) {
+function createVideo(name, desc, link, thumbEnd, channel) {
   name = name.substring(0, 25);
   desc = desc.substring(0, 150);
 
@@ -371,9 +370,8 @@ function createVideo(name, desc, link, thumbLink, mimein, channel) {
     name: name,
     desc: desc,
     link: link,
-    thumbLink: thumbLink,
+    thumbEnd: thumbEnd,
     channel: channel,
-    mime: mimein,
   });
   return tmp;
 }
@@ -384,16 +382,10 @@ function createComment(id, comment, user) {
 }
 
 let codec = "libx264";
-let resolutions = ["1920x1080", "1280x720", "100x100"];
+let resolutions = ["1920x1080", "1280x720", "640x360", "16x9"];
 
-function scaleVideo(videoPath, file) {
+function scaleVideo(videoPath, file, outpath) {
   let ff = ffmpeg(videoPath);
-
-  let outpath = "./client/upload/scaledVideos/" + file.video.md5;
-
-  //Create folder
-  fs.mkdirSync(outpath, { recursive: true })
-
   for (let i = 0; i < resolutions.length; i++) {
     ff.addOutput(outpath + "/" + resolutions[i] + ".mp4")
       .videoCodec(codec)
@@ -407,6 +399,13 @@ function scaleVideo(videoPath, file) {
     })
     .on("end", function () {
       console.log("Finished processing");
+      fs.unlink(videoPath, (err) => {
+        if (err) {
+          console.error(err)
+          return
+        }
+        console.log("Removed the original file")
+      })
     })
     .run();
 
