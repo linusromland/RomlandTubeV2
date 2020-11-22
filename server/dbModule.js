@@ -42,7 +42,7 @@ exports.findInDBOne = async (Model, toFind) => {
 }
 
 exports.findInDB = async (Model, limit) => {
-    let tmp = await Model.find({}).sort({ views : -1}).limit(limit)
+    let tmp = await Model.find({}).sort({ views: -1 }).limit(limit)
     return tmp;
 }
 
@@ -50,26 +50,30 @@ exports.searchInDB = async (Model, limit, search) => {
     const regex = new RegExp(escapeRegex(search), 'gi');
 
     let tmp;
-    
+
     try {
-        tmp = await Model.find({ 
-            $and: [{ $or: [{ _id: ObjectID(search) }] }] }).sort({ views : -1}).limit(limit)
+        tmp = await Model.find({
+            $and: [{ $or: [{ _id: ObjectID(search) }] }]
+        }).sort({ views: -1 }).limit(limit)
     } catch (error) {
-        tmp = await Model.find({ 
-            $and: [{ $or: [{ "name": regex }, { "desc": regex }] }] }).sort({ views : -1}).limit(limit)
+        tmp = await Model.find({
+            $and: [{ $or: [{ "name": regex }, { "desc": regex }] }]
+        }).sort({ views: -1 }).limit(limit)
     }
-    
+
     return tmp;
 }
 
 exports.findVideoWithID = async (Model, toFind) => {
-    let tmp = await Model.findOne({ _id: toFind })
-    console.log(tmp)
-    return tmp
+    return await Model.findOne({ _id: toFind })
 }
 
 exports.updateViews = async (Model, id) => {
-    await Model.update({_id: ObjectID(id)}, {$inc:{views:1}});
+    await Model.updateOne({ _id: ObjectID(id) }, { $inc: { views: 1 } });
+}
+
+exports.addComment = async (Model, id, Comment) => {
+    await Model.updateOne({ _id: ObjectID(id) }, { $push: { comments: Comment } });
 }
 
 //takes input with type Model. Saves that model in Database. Cant be used before cnctDB or cnctDBAuth.
@@ -81,5 +85,4 @@ exports.saveToDB = (input) => {
 
 function escapeRegex(text) {
     return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
-  };
-  
+};

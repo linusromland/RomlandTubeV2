@@ -1,6 +1,4 @@
-const { fileURLToPath } = require("url");
-
-//Ipmports depedencies and others files
+//Imports depedencies and others files
 const express = require("express"),
   bodyParser = require("body-parser"),
   mongoose = require("mongoose"),
@@ -17,9 +15,9 @@ const express = require("express"),
   probe = require("probe-image-size"),
   ffmpeg = require("fluent-ffmpeg"),
   mkdirp = require("mkdirp"),
-  sharp = require("sharp");
-
-const clientDir = __dirname + "/client/";
+  sharp = require("sharp"),
+  { fileURLToPath } = require("url"),
+  clientDir = __dirname + "/client/";
 
 /*Enables JSON, Cookies, extended for express and 
 creates a static path for CSS etc */
@@ -102,6 +100,7 @@ app.get("/view", async (req, res) => {
   let name = "Not Logged in";
   let id = req.query.id;
 
+  //console.log(JSON.parse(getVideo(id).comments));
   if (id) {
     if (await logIn(req.cookies.usrName, req.cookies.pswd)) {
       loggedIn = true;
@@ -116,6 +115,7 @@ app.get("/view", async (req, res) => {
       if (mongoose.isValidObjectId(id)) {
         try {
           let video = await getVideo(id);
+
           fs.access(
             "./client/" + video.link,
             fs.constants.R_OK,
@@ -133,11 +133,13 @@ app.get("/view", async (req, res) => {
                   5000
                 ) {
                   dBModule.updateViews(Video, id);
+
                   res.render("view", {
                     loggedIn: loggedIn,
                     name: name,
                     files: files,
                     vid: video,
+                    comments: video.comments.toJSON(),
                     eescape: eescape,
                   });
                 } else {
@@ -279,12 +281,21 @@ app.post("/login", async (req, res) => {
 });
 
 app.post("/authUser", async (req, res) => {
-  if (await logIn(req.cookie.usrName, req.cookie.pswd)) {
-    res.send("true");
+  if (req.cookies.usrName && await logIn(req.cookies.usrName, req.cookies.pswd)) {
+    res.status(200).send();
   } else {
-    res.send("false");
+    res.status(403).send();
   }
 });
+
+app.post('/comment', async (req, res) => {
+  if (req.cookies.usrName && await logIn(req.cookies.usrName, req.cookies.pswd)) {
+    createComment(req.body.id, req.body.comment, req.cookies.usrName);
+    res.status(201).send();
+  } else {
+    res.status(403).send();
+  }
+})
 
 app.post("/upload", async (_req, _res) => {
   if (await logIn(_req.cookies.usrName, _req.cookies.pswd)) {
@@ -365,6 +376,11 @@ function createVideo(name, desc, link, thumbLink, mimein, channel) {
     mime: mimein,
   });
   return tmp;
+}
+
+function createComment(id, comment, user) {
+  let tmp = { name: user, comment: comment, likes: 0, date: Date.now() }
+  dBModule.addComment(Video, id, tmp);
 }
 
 let codec = "libx264";

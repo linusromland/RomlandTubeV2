@@ -12,18 +12,56 @@
     <!--Import of Local JavaScript-->
     <script src="/js/global.js"></script>
     <script src="/js/index.js"></script>
+    <script>
+      function getURLParameter(name) {
+        return (
+          decodeURIComponent(
+            (new RegExp("[?|&]" + name + "=" + "([^&;]+?)(&|#|;|$)").exec(
+              location.search
+            ) || [null, ""])[1].replace(/\+/g, "%20")
+          ) || null
+        );
+      }
+
+      function addComment() {
+        let request = new XMLHttpRequest();
+        request.open("POST", "/comment", true);
+        request.setRequestHeader(
+          "Content-type",
+          "application/x-www-form-urlencoded"
+        );
+
+        let comment = document.getElementById("comment").value;
+        request.send(`id=${getURLParameter("id")}&comment=${comment}`);
+        request.onreadystatechange = function () {
+          if (request.status == 201) {
+            console.log("OkOkOk");
+          }
+        };
+      }
+    </script>
   </head>
   <body onload="onLoad()">
     <%- include ("partials/header.ejs") %>
     <h1>View - RomlandTube</h1>
-    <p> <%- eescape(vid.name) %></p>
-    <p> <%- eescape(vid.desc) %> </p>
-    <p> <%- eescape(vid.channel) %> </p>
+    <p><%- eescape(vid.name) %></p>
+    <p><%- eescape(vid.desc) %></p>
+    <p><%- eescape(vid.channel) %></p>
 
-    <p>Views:  <%- eescape(vid.views) %> </p>
+    <p>Views: <%- eescape(vid.views) %></p>
     <video width="320" height="240" controls>
-        <source src="<%- vid.link %>" type="<%- vid.mime %>">
-        Your browser does not support the video tag.
-      </video> 
+      <source src="<%- vid.link %>" type="<%- vid.mime %>" />
+      Your browser does not support the video tag.
+    </video>
+
+    <input id="comment" type="text">
+    <button onclick="addComment()">Add comment</button>
+    <% if (comments.length) { %>
+      <% comments.forEach(comment => { %>
+        <p><%- eescape(comment.name) %></p>
+        <p><%- eescape(comment.comment) %></p>
+        <p><%- eescape(comment.likes) %></p>
+      <% }) %>
+    <% } %> 
   </body>
 </html>
