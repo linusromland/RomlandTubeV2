@@ -382,7 +382,7 @@ function createComment(id, comment, user) {
 }
 
 let codec = "libx264";
-let resolutions = ["1920x1080", "1280x720", "640x360"];
+let resolutions = ["1920x1080", "1280x720", "640x360", "16x9"];
 
 function scaleVideo(videoPath, file, outpath) {
   let ff = ffmpeg(videoPath);
@@ -399,6 +399,13 @@ function scaleVideo(videoPath, file, outpath) {
     })
     .on("end", function () {
       console.log("Finished processing");
+      fs.unlink(videoPath, (err) => {
+        if (err) {
+          console.error(err)
+          return
+        }
+        console.log("Removed the original file")
+      })
     })
     .run();
 
