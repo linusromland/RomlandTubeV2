@@ -31,8 +31,22 @@ const VideoSchema = new mongoose.Schema({
         required: true
     },
     comments: {
-        type: Array,
-        default: []
+        name: {
+            type: String,
+            required: true
+        },
+        comment: {
+            type: String,
+            required: true
+        },
+        likes: {
+            type: Number,
+            default: 0
+        },
+        date: {
+            type: Date,
+            default: Date.now
+        }
     },
     date: {
         type: Date,

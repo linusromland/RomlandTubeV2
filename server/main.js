@@ -130,6 +130,7 @@ app.get("/view", async (req, res) => {
                   n - fs.statSync("./client/" + video.link).mtime.getTime() >
                   5000
                 ) {
+                  createComment(id, "test", name)
                   dBModule.updateViews(Video, id);
                   res.render("view", {
                     loggedIn: loggedIn,
@@ -363,6 +364,11 @@ function createVideo(name, desc, link, thumbLink, mimein, channel) {
     mime: mimein,
   });
   return tmp;
+}
+
+function createComment(id, comment, user) {
+  let tmp = {name: user, comment: comment}
+  dBModule.addComment(Video, id, tmp);
 }
 
 let codec = "libx264";
